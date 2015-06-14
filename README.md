@@ -10,7 +10,7 @@ LPIL的全称是：LinuxShell Projetc is not LinuxShell。此项目的目的是�
 对于这两个Shell，当前`KaliLinuxShell（KLS）`已经基本完善了，所以我们会偶尔的会进行维护，基本不会再有太大的更新了。
 但是由于ArchLinux的“Arch之道”，所以ArchLinux装好后会需要很多的设置。于是`ArchLinuxShell（ALS）`会有很多地方需要改进。
 
-Tips：ALS当前版本为1.0正式版。
+`Tips：ALS当前版本为1.0正式版。`
 
 ##How do I use this?: 
 
@@ -84,5 +84,5 @@ ArchLinuxShell（ALS）现在只有快速配置的Shell，而且2015.6.14才发�
 
 
 
-###最后感谢veners1995的帮忙，当前很大部分代码都是此人帮忙写的。再次感谢！！
+#####最后感谢veners1995的帮忙，当前很大部分代码都是此人帮忙写的。再次感谢！！
 
