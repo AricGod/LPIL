@@ -14,8 +14,6 @@ LPIL的全称是：LinuxShell Projetc is not LinuxShell。此项目的目的是�
 
 ###How do I use this?: 
 ===========
-
-
 ####首先，对于KaliLinux：
 
 由于KaliLinux自带git，所以git clone是最方便的：
