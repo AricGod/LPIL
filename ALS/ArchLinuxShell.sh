@@ -286,7 +286,6 @@ cat << EOF
 首先，我们要为您安装中文输入法。
 
 本版本仅支持fcitx框架+Googlepinyin输入法
-（由于一个输入法可能会安装失败所以再加上一个sunpinyin输入法）：
 
 但是如果您习惯使用Ibus或是五笔输入法的话请不要安装。所以，请根据您的需求输入Y/N。
 
@@ -304,7 +303,6 @@ do
 		echo "sudo pacman -S --noconfirm fcitx-qt5" >> continue.sh
 		echo "sudo pacman -S --noconfirm fcitx-googlepinyin" >> continue.sh
 		echo "sudo pacman -S --noconfirm fcitx-configtool" >> continue.sh
-		echo "sudo pacman -S --noconfirm fcitx-sunpinyin" >> continue.sh
 		echo "" >> continue.sh
 		break
 	elif [ ${fci} = N ] || [ ${fci} = n ];then
