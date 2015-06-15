@@ -56,7 +56,7 @@ chmod +x ArchLinuxShell.sh
 >ArchLinuxShell（ALS）现在只有快速配置的Shell，而且2015.6.14才发布了1.0正式版。ALS是接下来的重点开发目标。
 >
 >
->3、使用时我需 要注意什么？
+>3、使用时我还需要注意什么？
 >
 >：LPIL scripts的部分操作可能需要您具有一定的权限，请确保这一点以保证配置的顺利完成
 >
