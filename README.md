@@ -5,7 +5,7 @@
 
 
 LPIL的全称是：LinuxShell Projetc is not LinuxShell。此项目的目的是让大家能快速的安装与配置一些著名的Linux发行版。
-当前共有`KaliLinux`和`ArchLinux`的快速设置的Shell scripts，我们正在计划开发DebianLinux的Shell script。
+当前共有`KaliLinux`和`ArchLinux`的快速设置的Shell scripts，我们正在计划开发适用于DebianLinux的Shell script。
 
 对于这两个Shell script，当前`KaliLinuxShell（KLS）`已经基本完善了，所以我们会偶尔的会进行维护，基本不会再有太大的更新了。
 但是由于ArchLinux的“Arch之道”，所以ArchLinux装好后会需要很多的设置。于是`ArchLinuxShell（ALS）`会有很多地方需要改进。
@@ -80,5 +80,3 @@ chmod +x ArchLinuxShell.sh
 >
 >：除了ALS在ArchLinux运行会乱码之外暂时没什么问题了。这个问题的临时解决方案就是先记住每个选项的意思，然后再在ArchLinux>>下运行。
 
-
-#####最后感谢veners1995的帮忙，当前很大部分代码都是此人帮忙写的。再次感谢！！
