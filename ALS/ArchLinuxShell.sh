@@ -14,23 +14,20 @@
 # See the License for the specific language governing permissions and 
 # limitations under the License. 
 
-reset
-
-cat << EOF
-欢迎您来到Arch Linux Shell（快速设置）
-
-版本：1.0 ，正式版
-
-EOF
+mv continue.sh continue.sh.backup 2>> /dev/null
 
 if [ $(getconf LONG_BIT) = 64 ];then
 	sed -i '89,90d' /etc/pacman.conf >> /dev/null 2>&1
 	sed -i '88a Include = /etc/pacman.d/mirrorlist' /etc/pacman.conf >> /dev/null 2>&1
 	sed -i '88a [multilib]' /etc/pacman.conf >> /dev/null 2>&1
-	pacman -Syu --noconfirm  2>> /dev/null 
+	pacman -Syu --noconfirm >> /dev/null 2>&1
 fi
 
+reset
 cat << EOF
+欢迎您来到Arch Linux Shell（快速设置）
+
+版本：1.5 ，正式版
 
 首先，我们要为您创建一个普通用户（此用户为wheel用户组，可以使用sudo）
 如果您已经创建，请直接输入两次回车
@@ -44,10 +41,15 @@ read -p "您的新用户的用户名（小写）：" usrnm
 read -s -p "您的新用户的密码：" usrpasswd
 useradd -m -G wheel -s /bin/bash ${usrnm}
 echo "${usrnm}:${usrpasswd}" | chpasswd
-sed -i "73a ${usrnm} ALL=(ALL) ALL" /etc/sudoers
 
+if [ ! -n "${usrnm}" ];then
+	echo ""
+else
+	sed -i "73a ${usrnm} ALL=(ALL) ALL" /etc/sudoers
 clear
+
 cat << EOF
+
 您的新用户已经创建完成，现在我们继续进行设置。
 
 
@@ -84,14 +86,13 @@ echo "sudo pacman -S --noconfirm wqy-microhei" >> continue.sh
 echo "sudo pacman -S --noconfirm xorg-server" >> continue.sh
 echo "sudo pacman -S --noconfirm xorg-xinit" >> continue.sh
 echo "cp /etc/X11/xinit/xinitrc ~/.xinitrc" >> continue.sh
-echo "sed '\$d' ~/.xinitrc" >> continue.sh
+echo "sed -i '\$d' ~/.xinitrc" >> continue.sh
 echo "" >> continue.sh
 
 cat << EOF
 请问您是否想安装Yaourt？Yaourt作为pacman的一个外壳增加了对于AUR的支持。
 
 基本属于必装软件，但是如果不需要的话可以不安装。
-
 
 EOF
 
@@ -144,10 +145,13 @@ do
 
 	if [ ${zsh} = Y ] || [ ${zsh} = y ];then
 		echo "#安装zsh" >> continue.sh
-		echo "sudo pacman -S --noconfirm  zsh" >> continue.sh
+		echo "sudo pacman -S --noconfirm zsh" >> continue.sh
 		echo "git clone git://github.com/robbyrussell/oh-my-zsh.git ~/.oh-my-zsh" >> continue.sh
 		echo "cp -f ~/.oh-my-zsh/templates/zshrc.zsh-template ~/.zshrc" >> continue.sh
 		echo "echo "${usrpasswd}"|chsh -s /bin/zsh" >> continue.sh
+		cp -f /home/${usrnm}/.oh-my-zsh ~/.oh-my-zsh
+		cp -f /home/${usrnm}/.oh-my-zsh/templates/zshrc.zsh-template ~/.zshrc
+		chsh -s /bin/zsh
 		echo "" >> continue.sh
 		break
 	elif [ ${zsh} = N ] || [ ${zsh} = n ];then
@@ -177,9 +181,9 @@ echo "#安装桌面环境" >> continue.sh
 
 while true
 do
-	read -n1 -p "请输入1-5或99：" choose
+	read -n2 -p "请输入1-5或99：" choose
 	echo ""
-	case $choose in
+	case ${choose} in
 	1)	chose=gnome
 		echo "echo "exec gnome-session" >> ~/.xinitrc" >> continue.sh
 		echo "sudo pacman -S --noconfirm gnome" >> continue.sh
@@ -232,22 +236,11 @@ do
 	4)	chose=cinnamon
 		echo "echo "exec cinnamon-session" >> ~/.xinitrc" >> continue.sh
 		echo "sudo pacman -S --noconfirm cinnamon" >> continue.sh
+		echo "sudo pacman -S --noconfirm gnome-screenshot" >> continue.sh
+		echo "sudo pacman -S --noconfirm mate-terminal" >> continue.sh
+		echo "sudo pacman -S --noconfirm evince" >> continue.sh
+		echo "sudo pacman -S --noconfirm viewnior" >> continue.sh
 		clear
-		echo "请问您是否要安装mate的扩展包？虽然桌面环境并不相同但是软件完全兼容。"
-		echo ""
-		echo "而且cinnamon不安装扩展包的话会出现连虚拟终端都没有的尴尬局面。"
-		echo ""
-		while true
-		do
-			read -n1 -p "请输入Y/N：" ge
-			echo ""
-			if [ ${ge} = Y ] || [ ${ge} = y ];then
-				echo "sudo pacman -S --noconfirm mate-extra" >> continue.sh
-				break
-			elif [ ${ge} = N ] || [ ${ge} = n ];then
-				break
-			fi
-		done
 		echo "" >> continue.sh
 		break
 	;;
@@ -328,7 +321,7 @@ cat << EOF
 其中，emacs和gvim属于专业编辑器。如果您对其不了解千万不要选择，而gedit和leafpad更加简单易用，大家可以随意挑选。
 
 
-现在，请像刚才选择桌面环境那样选择文本编辑器吧：1、gvim  2、emace 3、gedit 4、leafpad  99不安装
+现在，请像刚才选择桌面环境那样选择文本编辑器吧：1、gvim  2、emace 3、gedit 4、leafpad  99、不安装
 
 EOF
 
@@ -336,14 +329,20 @@ echo "#安装文本编辑器" >> continue.sh
 
 while true
 do
-	read -n1 -p "请输入1-4或99：" text
+	read -n2 -p "请输入1-4或99：" text
 	echo ""	
-	case $text in
+	case ${text} in
 	1)	echo "sudo pacman -S --noconfirm gvim" >> continue.sh
 		echo "sudo pacman -S --noconfirm gvim-python3" >> continue.sh
-		echo "echo "filetype indent on" >> ~/.vimrc" >> continue.sh
-		echo "echo "syntax enable" >> ~/.vimrc" >> continue.sh
-		echo "echo "colorscheme murphy" >> ~/.vimrc" >> continue.sh
+
+		echo "set nocompatible" > /etc/vimrc
+		echo "filetype indent on" >> /etc/vimrc
+		echo "syntax enable" >> /etc/vimrc
+		echo "colorscheme murphy" >> /etc/vimrc
+		echo "set nobackup" >> /etc/vimrc
+		echo "set nowritebackup" >> /etc/vimrc
+		echo "set noswapfile" >> /etc/vimrc
+		echo "set wrapscan" >> /etc/vimrc
 		echo "" >> continue.sh
 		break
 	;;
@@ -386,9 +385,9 @@ echo "#安装视频播放器" >> continue.sh
 
 while true
 do
-	read -n1 -p "请输入1-2或99：" video
+	read -n2 -p "请输入1-2或99：" video
 	echo ""
-	case $video in 
+	case ${video} in 
 	1)
 		echo "sudo pacman -S --noconfirm smplayer" >> continue.sh
 		echo "" >> continue.sh
@@ -417,14 +416,13 @@ cat << EOF
 还是像刚才一样：1、firefox  2、opera 99、不安装
 
 EOF
-
 echo "#安装网页浏览器" >> continue.sh
 echo "sudo pacman -S --noconfirm flashplugin" >> continue.sh
 while true
 do
-	read -n1 -p "请输入1-2或99：" wb
+	read -n2 -p "请输入1-2或99：" wb
 	echo ""
-	case $wb in
+	case ${wb} in
 	1)
 		echo "sudo pacman -S --noconfirm firefox" >> continue.sh
 		clear
@@ -458,6 +456,8 @@ cat << EOF
 如果您现在是实体机安装并且是笔记本电脑而且带有触摸板的话
 
 而没有驱动触摸板将不会工作,如果您确实是上述的情况请安装触摸板驱动：
+
+
 EOF
 
 while true
@@ -480,6 +480,7 @@ done
 reset
 mv continue.sh /home/${usrnm}/continue.sh
 chmod 777 /home/${usrnm}/continue.sh
+mv continue.sh.backup continue.sh
 rm -rf /var/log/*
 rm -rf /var/tmp/*
 rm -rf /tmp/*
@@ -496,11 +497,11 @@ cat << EOF
 EOF
 		
 #echo "#GNOME计算器" >> continue.sh
-#echo "yes|sudo pacman -S gcalctool" >> continue.sh
+#echo "sudo pacman -S --noconfirm gcalctool" >> continue.sh
 
-#echo "yes|sudo pacman -S libreoffice-fresh" >> continue.sh
-#echo "yes|sudo pacman -S libreoffice-fresh-zh-CN" >> continue.sh
+#echo "sudo pacman -S --noconfirm libreoffice-fresh" >> continue.sh
+#echo "sudo pacman -S --noconfirm libreoffice-fresh-zh-CN" >> continue.sh
 
 #echo "#Python" >> continue.sh
-#echo "yes|sudo pacman -S python" >> continue.sh
-#echo "yes|sudo pacman -S ipython" >> continue.sh
+#echo "sudo pacman -S --noconfirm python" >> continue.sh
+#echo "sudo pacman -S --noconfirm ipython" >> continue.sh
