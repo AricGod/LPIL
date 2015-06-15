@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and 
 # limitations under the License. 
 
-mv continue.sh continue.sh.backup 2>> /dev/null
+mv -f continue.sh continue.sh.backup 2>> /dev/null
 
 if [ $(getconf LONG_BIT) = 64 ];then
 	sed -i '89,90d' /etc/pacman.conf >> /dev/null 2>&1
@@ -332,8 +332,9 @@ do
 	case ${text} in
 	1)	echo "sudo pacman -S --noconfirm gvim" >> continue.sh
 		echo "sudo pacman -S --noconfirm gvim-python3" >> continue.sh
-
+		mv -f /etc/vimrc /etc/vimrc.backup 2> /dev/null
 		echo "set nocompatible" > /etc/vimrc
+		echo "set nu" >> /etc/vimrc
 		echo "filetype indent on" >> /etc/vimrc
 		echo "syntax enable" >> /etc/vimrc
 		echo "colorscheme murphy" >> /etc/vimrc
@@ -476,7 +477,7 @@ do
 done
 
 reset
-mv continue.sh /home/${usrnm}/continue.sh
+mv -f continue.sh /home/${usrnm}/continue.sh
 chmod 777 /home/${usrnm}/continue.sh
 mv continue.sh.backup continue.sh
 rm -rf /var/log/*
