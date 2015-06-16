@@ -1,7 +1,7 @@
 ##Linux Shell Projet
 
 
-###What is the "LPIL"?: 
+###What is the "LPIL": 
 
 
 LPIL的全称是：LinuxShell Projetc is not LinuxShell。此项目的目的是让大家能快速的安装与配置一些著名的Linux发行版。
@@ -19,7 +19,7 @@ LPIL的全称是：LinuxShell Projetc is not LinuxShell。此项目的目的是�
 由于KaliLinux自带git，所以git clone是最方便的：
 在您联网的时候，复制下面这些代码到终端：
 ```
-git clone https://github.com/Guanrenfu/LPIL
+git clone --depth=1 https://github.com/Guanrenfu/LPIL
 cd LPIL
 cd KLS
 chmod +x KaliLinuxShell.sh
@@ -29,11 +29,17 @@ chmod +x KaliLinuxShell.sh
 
 ####对于ArchLinux：
 
-当您安装ArchLinux完成后，先确认可以联网，然后这么做：
+当您安装ArchLinux完成后，先确认可以联网，然后在tty输入这些：
 
 ```
 pacman -S --noconfirm git
-git clone https://github.com/Guanrenfu/LPIL
+pacman -S --noconfirm wqy-microhei
+pacman -S --noconfirm fbterm
+fbterm
+```
+此时会进入一个虚拟终端，前面输入的将被清空。现在tty就可以正常显示中文了，之后输入这些：
+```
+git clone --depth=1 https://github.com/Guanrenfu/LPIL
 cd LPIL
 cd ALS
 chmod +x ArchLinuxShell.sh
@@ -63,20 +69,16 @@ chmod +x ArchLinuxShell.sh
 >
 >4、接下来的目标是什么？
 >
->：ALS还有一个重大的Bug没有解决（在ArchLinux运行中文注释会乱码），然后本人还计划要开发DebianLinuxShell（DLS）系列。
+>：ALS我们将持续更新，然后本人还计划要开发DebianLinuxShell（DLS）系列。
 >
 >
 >5、当前开发团队的规模有多大？
 >
->：很不幸的是，当前的开发团队只有我一个人在努力的开发与维护。如果您愿意帮忙的话我将会很欢迎的。
+>：当前共有本人与@veners1995 在努力维护，同时@Arthur2e5也对本项目十分热情。
 >
 >
->6、此项目是否开源？
+>6、此项目的协议是？
 >
->：没错，但是此项目将遵循Apache协议。
+>：此项目遵循Apache协议。
 >
 >
->7、当前有什么问题没有？
->
->：除了ALS在ArchLinux运行会乱码之外暂时没什么问题了。这个问题的临时解决方案就是先记住每个选项的意思，然后再在ArchLinux>>下运行。
-
