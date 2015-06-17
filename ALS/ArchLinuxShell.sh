@@ -46,8 +46,9 @@ if [ ! -n "${usrnm}" ];then
 	echo ""
 else
 	sed -i "73a ${usrnm} ALL=(ALL) ALL" /etc/sudoers
-clear
+fi
 
+clear
 cat << EOF
 
 您的新用户已经创建完成，现在我们继续进行设置。
