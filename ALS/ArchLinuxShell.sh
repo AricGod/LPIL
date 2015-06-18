@@ -16,6 +16,40 @@
 
 mv -f continue.sh continue.sh.backup 2>> /dev/null
 
+#将安装软件所需命令放入关联数组
+declare -A softwareInstallCmd
+#软件
+softwareInstallCmd['gvim']='sudo pacman -S --noconfirm gvim\nsudo pacman -S --noconfirm gvim-python3'
+softwareInstallCmd['emacs']='sudo pacman -S --noconfirm emacs'
+softwareInstallCmd['gedit']='sudo pacman -S --noconfirm gedit'
+softwareInstallCmd['leafpad']='sudo pacman -S --noconfirm leafpad'
+softwareInstallCmd['smplayer']='sudo pacman -S --noconfirm smplayer'
+softwareInstallCmd['vlc']='sudo pacman -S --noconfirm vlc'
+softwareInstallCmd['firefox']='sudo pacman -S --noconfirm firefox'
+softwareInstallCmd['opera']='sudo pacman -S --noconfirm opera'
+#桌面环境
+softwareInstallCmd['gnome']='sudo pacman -S --noconfirm gnome'
+softwareInstallCmd['plasma']='sudo pacman -S --noconfirm plasma'
+softwareInstallCmd['xfce4']='sudo pacman -S --noconfirm xfce4'
+softwareInstallCmd['cinnamon']='sudo pacman -S --noconfirm cinnamon\nsudo pacman -S --noconfirm gnome-screenshot\nsudo pacman -S --noconfirm mate-terminal\nsudo pacman -S --noconfirm evince\nsudo pacman -S --noconfirm viewnior'
+softwareInstallCmd['mate']='sudo pacman -S --noconfirm mate'
+
+function chooseSoftware
+{
+	unset choose
+	select choose in $@;do
+		if [ ${choose:-NONE} == 'NONE' ];then
+			continue;
+		elif [ ${choose} != '不安装' ];then
+			echo -e ${softwareInstallCmd[${choose}]} >> continue.sh
+			break
+		else
+			echo '#${choose}' >> continue.sh
+			break
+		fi
+	done
+}
+
 if [ $(getconf LONG_BIT) = 64 ];then
 	sed -i '89,90d' /etc/pacman.conf >> /dev/null 2>&1
 	sed -i '88a Include = /etc/pacman.d/mirrorlist' /etc/pacman.conf >> /dev/null 2>&1
@@ -176,103 +210,86 @@ EOF
 
 read -p "请按回车继续"  var
 clear
-echo "现在，请选择一个桌面环境：1、gnome  2、plasma  3、xfce4  4、cinnamon  5、mate。  99、不安装"
+echo "现在，请选择一个桌面环境：1、gnome  2、plasma  3、xfce4  4、cinnamon  5、mate。  6、不安装"
 echo ""
 echo "#安装桌面环境" >> continue.sh
 
-while true
-do
-	read -n2 -p "请输入1-5或99：" choose
+PS3='请输入1-6：'
+echo ""
+chooseSoftware 'gnome' 'plasma' 'xfce4' 'cinnamon' 'mate' '不安装桌面环境'
+#choose为保存用户选项的全局变量，定义于chooseSoftware函数中
+case ${choose} in
+gnome)
+	echo "echo 'exec gnome-session' >> ~/.xinitrc" >> continue.sh
+	clear
+	echo "请问您是否要安装${choose}扩展包？其中包含了很多${choose}的原生软件和一些主题等（建议安装）"
 	echo ""
-	case ${choose} in
-	1)	chose=gnome
-		echo "echo "exec gnome-session" >> ~/.xinitrc" >> continue.sh
-		echo "sudo pacman -S --noconfirm gnome" >> continue.sh
-		clear
-		echo "请问您是否要安装${chose}扩展包？其中包含了很多${chose}的原生软件和一些主题等（建议安装）"
+	while true
+	do
+		read -n1 -p "请输入Y/N：" ge
 		echo ""
-		while true
-		do
-			read -n1 -p "请输入Y/N：" ge
-			echo ""
-			if [ ${ge} = Y ] || [ ${ge} = y ];then
-				echo "sudo pacman -S --noconfirm gnome-extra" >> continue.sh
-				break
-			elif [ ${ge} = N ] || [ ${ge} = n ];then
-				break
-			fi
-		done
-		echo "" >> continue.sh
-		break
-	;;
+		if [ ${ge} = Y ] || [ ${ge} = y ];then
+			echo "sudo pacman -S --noconfirm gnome-extra" >> continue.sh
+			break
+		elif [ ${ge} = N ] || [ ${ge} = n ];then
+			break
+		fi
+	done
+	echo "" >> continue.sh
+;;
 
-	2)	chose=plasma
-		echo "echo "exec startkde" >> ~/.xinitrc" >> continue.sh
-		echo "sudo pacman -S --noconfirm plasma" >> continue.sh
-		echo "" >> continue.sh
-		break
-	;;
+plasma)	
+	echo "echo 'exec startkde' >> ~/.xinitrc" >> continue.sh
+	echo "" >> continue.sh
+;;
 
-	3)	chose=xfce4
-		echo "echo "exec startxfce4" >> ~/.xinitrc" >> continue.sh
-		echo "sudo pacman -S --noconfirm xfce4" >> continue.sh
-		clear
-		echo "请问您是否要安装${chose}扩展包？其中包含了很多${chose}的原生软件和一些主题等（建议安装）"
+xfce4)	
+	echo "echo 'exec startxfce4' >> ~/.xinitrc" >> continue.sh
+	echo "" >> continue.sh
+	clear
+	echo "请问您是否要安装${choose}扩展包？其中包含了很多${choose}的原生软件和一些主题等（建议安装）"
+	echo ""
+	while true
+	do
+		read -n1 -p "请输入Y/N：" ge
 		echo ""
-		while true
-		do
-			read -n1 -p "请输入Y/N：" ge
-			echo ""
-			if [ ${ge} = Y ] || [ ${ge} = y ];then
-				break
-				echo "sudo pacman -S --noconfirm xfce4-goodies" >> continue.sh
-			elif [ ${ge} = N ] || [ ${ge} = n ];then
-				break
-			fi
-		done
-		echo "" >> continue.sh
-		break
-	;;
+		if [ ${ge} = Y ] || [ ${ge} = y ];then
+			break
+			echo "sudo pacman -S --noconfirm xfce4-goodies" >> continue.sh
+		elif [ ${ge} = N ] || [ ${ge} = n ];then
+			break
+		fi
+	done
+	echo "" >> continue.sh
+;;
 
-	4)	chose=cinnamon
-		echo "echo "exec cinnamon-session" >> ~/.xinitrc" >> continue.sh
-		echo "sudo pacman -S --noconfirm cinnamon" >> continue.sh
-		echo "sudo pacman -S --noconfirm gnome-screenshot" >> continue.sh
-		echo "sudo pacman -S --noconfirm mate-terminal" >> continue.sh
-		echo "sudo pacman -S --noconfirm evince" >> continue.sh
-		echo "sudo pacman -S --noconfirm viewnior" >> continue.sh
-		clear
-		echo "" >> continue.sh
-		break
-	;;
+cinnamon)	
+	echo "echo 'exec cinnamon-session' >> ~/.xinitrc" >> continue.sh
+	clear
+	echo "" >> continue.sh
+;;
 
-	5)	chose=mate
-		echo "echo "exec mate-session" >> ~/.xinitrc" >> continue.sh
-		echo "sudo pacman -S --noconfirm mate" >> continue.sh
-		clear
-		echo "请问您是否要安装${chose}扩展包？其中包含了很多${chose}的原生软件和一些主题等（建议安装）"
+mate)	
+	echo "echo 'exec mate-session' >> ~/.xinitrc" >> continue.sh
+	clear
+	echo "请问您是否要安装${choose}扩展包？其中包含了很多${choose}的原生软件和一些主题等（建议安装）"
+	echo ""
+	while true
+	do
+		read -n1 -p "请输入Y/N：" ge
 		echo ""
-		while true
-		do
-			read -n1 -p "请输入Y/N：" ge
-			echo ""
-			if [ ${ge} = Y ] || [ ${ge} = y ];then
-				echo "sudo pacman -S  --noconfirm mate-extra" >> continue.sh
-				break
-			elif [ ${ge} = N ] || [ ${ge} = n ];then
-				break
-			fi
-		done
-		echo "" >> continue.sh
-		break
-	;;
+		if [ ${ge} = Y ] || [ ${ge} = y ];then
+			echo "sudo pacman -S  --noconfirm mate-extra" >> continue.sh
+			break
+		elif [ ${ge} = N ] || [ ${ge} = n ];then
+			break
+		fi
+	done
+	echo "" >> continue.sh
+	break
+;;
 
-	99)
-		echo "#不安装桌面环境" >> continue.sh
-		break
-	;;
-	esac
-done
+esac
 
 clear
 echo "恭喜您完成了多半的配置了，现在让我们来看一下几个日常用的软件吧："
@@ -292,7 +309,6 @@ cat << EOF
 
 
 EOF
-
 while true
 do
 	read -n1 -p "请输入Y/N：" fci
@@ -320,135 +336,70 @@ cat << EOF
 其中，emacs和gvim属于专业编辑器。如果您对其不了解千万不要选择，而gedit和leafpad更加简单易用，大家可以随意挑选。
 
 
-现在，请像刚才选择桌面环境那样选择文本编辑器吧：1、gvim  2、emace 3、gedit 4、leafpad  99、不安装
+现在，请像刚才选择桌面环境那样选择文本编辑器吧：1、gvim  2、emace 3、gedit 4、leafpad  5、不安装
 
 EOF
 
 echo "#安装文本编辑器" >> continue.sh
 
-while true
-do
-	read -n2 -p "请输入1-4或99：" text
-	echo ""	
-	case ${text} in
-	1)	echo "sudo pacman -S --noconfirm gvim" >> continue.sh
-		echo "sudo pacman -S --noconfirm gvim-python3" >> continue.sh
-		mv -f /etc/vimrc /etc/vimrc.backup 2> /dev/null
-		echo "set nocompatible" > /etc/vimrc
-		echo "set nu" >> /etc/vimrc
-		echo "filetype indent on" >> /etc/vimrc
-		echo "syntax enable" >> /etc/vimrc
-		echo "colorscheme murphy" >> /etc/vimrc
-		echo "set nobackup" >> /etc/vimrc
-		echo "set nowritebackup" >> /etc/vimrc
-		echo "set noswapfile" >> /etc/vimrc
-		echo "set wrapscan" >> /etc/vimrc
-		echo "" >> continue.sh
-		break
-	;;
+PS3='请输入1-5:'
+chooseSoftware 'gvim' 'emacs' 'gedit' 'leafpad' '不安装文本编辑器'
+echo "" >> continue.sh
 
-	2)
-		echo "sudo pacman -S --noconfirm emacs" >> continue.sh
-		echo "" >> continue.sh
-		break
-	;;
-	
-	3)
-		echo "sudo pacman -S --noconfirm gedit" >> continue.sh
-		echo "" >> continue.sh
-		break
-	;;
+if [ ${choose} == 'gvim' ];then
+	mv -f /etc/vimrc /etc/vimrc.backup 2> /dev/null
+	echo "set nocompatible" > /etc/vimrc
+	echo "set nu" >> /etc/vimrc
+	echo "filetype indent on" >> /etc/vimrc
+	echo "syntax enable" >> /etc/vimrc
+	echo "colorscheme murphy" >> /etc/vimrc
+	echo "set nobackup" >> /etc/vimrc
+	echo "set nowritebackup" >> /etc/vimrc
+	echo "set noswapfile" >> /etc/vimrc
+	echo "set wrapscan" >> /etc/vimrc
+fi
 
-	4)
-		echo "sudo pacman -S --noconfirm leafpad" >> continue.sh
-		echo "" >> continue.sh
-		break
-	;;
-
-	99)
-		echo "#不安装文本编辑器" >> continue.sh
-		echo "" >> continue.sh
-		break
-	;;
-	esac
-done
 clear
 cat << EOF
 现在，我们来挑选一个音视播放器。本版本共提供SMPlayer和VLC，个人推荐SMPlayer。
 
 
-请选择您喜欢的播放器，选择smplayer请输入1，VLC请输入2。99,不安装
+请选择您喜欢的播放器，选择smplayer请输入1，VLC请输入2。3,不安装
 
 EOF
 
 echo "#安装视频播放器" >> continue.sh
 
-while true
-do
-	read -n2 -p "请输入1-2或99：" video
-	echo ""
-	case ${video} in 
-	1)
-		echo "sudo pacman -S --noconfirm smplayer" >> continue.sh
-		echo "" >> continue.sh
-		break
-	;;
-
-	2)
-	       	echo "sudo pacman -S --noconfirm vlc" >> continue.sh
-		echo "" >> continue.sh
-		break
-	;;
-
-	99)
-		echo "#不安装音视频播放器" >> continue.sh
-		echo "" >> continue.sh
-		break
-	;;
-	esac
-done
+PS3='请输入1-3：'
+echo ""
+chooseSoftware 'smplayer' 'vlc' '不安装视频播放器'
+echo "" >> continue.sh
 
 clear
 cat << EOF
 现在，我们可以开始安装浏览器了：我们当前提供有firefox和opera
 
 
-还是像刚才一样：1、firefox  2、opera 99、不安装
+还是像刚才一样：1、firefox  2、opera 3、不安装
 
 EOF
+
 echo "#安装网页浏览器" >> continue.sh
 echo "sudo pacman -S --noconfirm flashplugin" >> continue.sh
-while true
-do
-	read -n2 -p "请输入1-2或99：" wb
+
+PS3='请输入1-3：'
+echo ""
+chooseSoftware 'firefox' 'opera' '不安装网页浏览器'
+clear
+if [ ${choose} == 'firefox' ];then
+	echo "请问您是否要安装Firefox的中文支持？安装后浏览器将改为中文界面。"
 	echo ""
-	case ${wb} in
-	1)
-		echo "sudo pacman -S --noconfirm firefox" >> continue.sh
-		clear
-		echo "请问您是否要安装Firefox的中文支持？安装后浏览器将改为中文界面。"
-		echo ""
-		read -n1 -p "请输入Y/N：" chs
-		if [ ${chs} = Y ] || [ ${chs} = y ];then
-			echo "sudo pacman -S --noconfirm firefox-i18n-zh-cn" >> continue.sh
-		fi
-		echo "" >> continue.sh
-		break
-	;;
-
-	2)
-		echo "sudo pacman -S --noconfirm opera" >> continue.sh
-		echo "" >> continue.sh
-		break
-	;;
-
-	99)
-		echo "#不安装网页浏览器" >> continue.sh
-		echo "" >> continue.sh
-		break
-	;;
-	esac
-done
+	read -n1 -p "请输入Y/N：" chs
+	if [ ${chs} = Y ] || [ ${chs} = y ];then
+		echo "sudo pacman -S --noconfirm firefox-i18n-zh-cn" >> continue.sh
+	fi
+fi
+echo "" >> continue.sh
 
 
 clear
